@@ -1,5 +1,5 @@
 <script setup>
-import { computed, defineEmits, defineProps, ref } from 'vue'
+import { computed, defineEmits } from 'vue'
 import Button from 'primevue/button'
 
 const props = defineProps({
@@ -7,31 +7,53 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+
+  activeDate: {
+    type: Object,
+    default: () => ({
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1,
+    }),
+  },
 })
 
-const emit = defineEmits(['filter:date'])
+const emit = defineEmits(['update:date'])
+
+const activeMonth = computed({
+  get: () => props.activeDate.month,
+  set: (value) => {
+    emit('update:date', { key: 'month', value })
+  },
+})
+
+const activeYear = computed({
+  get: () => props.activeDate.year,
+  set: (value) => {
+    emit('update:date', { key: 'year', value })
+  },
+})
 
 const previousYear = computed(() => {
-  const prev = year.value - 1
+  const prev = activeYear.value - 1
   const res = years.includes(prev) ? prev : null
   return res
 })
 
 const previousMonth = computed(() => {
-  const prev = month.value - 1
-  const res = recordDates[year.value].includes(prev) ? prev : null
+  const prev = activeMonth.value - 1
+  const res = recordDates[activeYear.value].includes(prev) ? prev : null
   return res
 })
 
 const nextYear = computed(() => {
-  const next = year.value + 1
+  const next = activeYear.value + 1
   const res = years.includes(next) ? next : null
   return res
 })
 
 const nextMonth = computed(() => {
-  const next = month.value + 1
-  const res = recordDates[year.value].includes(next) ? next : null
+  const next = activeMonth.value + 1
+  const res = recordDates[activeYear.value].includes(next) ? next : null
   return res
 })
 
@@ -43,46 +65,35 @@ const sortMonthsByYear = (prev, [year, data]) => {
 }
 
 const getPreviousYear = () => {
-  year.value = previousYear.value
-  month.value =
-    month.value in recordDates[year.value]
-      ? month.value
-      : recordDates[year.value][0]
-
-  emit('filter:date', { year: year.value, month: month.value })
+  activeYear.value = previousYear.value
+  activeMonth.value =
+    activeMonth.value in recordDates[activeYear.value]
+      ? activeMonth.value
+      : recordDates[activeYear.value].at(-1)
 }
 
 const getNextYear = () => {
-  year.value = nextYear.value
-  month.value =
-    month.value in recordDates[year.value]
-      ? month.value
-      : recordDates[year.value][0]
-
-  emit('filter:date', { year: year.value, month: month.value })
+  activeYear.value = nextYear.value
+  activeMonth.value =
+    activeMonth.value in recordDates[activeYear.value]
+      ? activeMonth.value
+      : recordDates[activeYear.value].at(-1)
 }
 
 const getPreviousMonth = () => {
-  month.value = previousMonth.value
-
-  emit('filter:date', { year: year.value, month: month.value })
+  activeMonth.value = previousMonth.value
 }
 
 const getNextMonth = () => {
-  month.value = nextMonth.value
-
-  emit('filter:date', { year: year.value, month: month.value })
+  activeMonth.value = nextMonth.value
 }
 
 let years = []
-const year = ref(new Date().getFullYear())
-const month = ref(new Date().getMonth() + 1)
-
 const recordDates = Object.entries(props.expenses).reduce(sortMonthsByYear, {})
 </script>
 
 <template>
-  <div class="flex flex-column">
+  <div class="flex flex-column bg-white">
     <div class="flex justify-content-center align-items-center">
       <Button
         icon="pi pi-angle-double-left"
@@ -97,7 +108,7 @@ const recordDates = Object.entries(props.expenses).reduce(sortMonthsByYear, {})
         @click="getPreviousMonth"
       />
 
-      <p class="m-0">{{ month }} {{ year }}</p>
+      <p class="m-0">{{ activeMonth }} {{ activeYear }}</p>
 
       <Button
         icon="pi pi-angle-right"

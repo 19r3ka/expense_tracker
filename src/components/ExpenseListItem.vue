@@ -1,5 +1,5 @@
 <script setup>
-import { computed, defineProps } from 'vue'
+import { computed } from 'vue'
 import { categories } from '../helpers/expense'
 
 const props = defineProps({
@@ -33,9 +33,18 @@ const textColorClass = computed(
       categories.find((item) => item.name === props.item.category).color
     }-${colorShade * 2}`
 )
+
 const categoryIcon = computed(
   () => categories.find((item) => item.name === props.item.category).icon
 )
+
+const title = computed(() => capitalize(props.item.description))
+
+const capitalize = (str) =>
+  str
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 </script>
 
 <template>
@@ -50,9 +59,9 @@ const categoryIcon = computed(
 
     <div class="col-6 flex flex-wrap">
       <p class="font-bold m-0 w-full text-600 text-sm">
-        {{ props.item.description }}
+        {{ title }}
       </p>
-      <p class="m-0 mt-1 text-xs" :class="textColorClass">
+      <p class="m-0 mt-1 text-xs capitalize" :class="textColorClass">
         {{ props.item.category }}
       </p>
     </div>

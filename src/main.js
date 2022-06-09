@@ -1,6 +1,7 @@
 import 'primevue/resources/themes/saga-green/theme.css' //theme
 import 'primevue/resources/primevue.min.css' //core css
 import 'primeicons/primeicons.css' //icons
+import 'animate.css' //animations
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

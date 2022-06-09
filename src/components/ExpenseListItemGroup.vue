@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, ref } from 'vue'
+import { computed, ref } from 'vue'
 import Button from 'primevue/button'
 import Divider from 'primevue/divider'
 
@@ -14,6 +14,10 @@ const props = defineProps({
   },
 })
 
+const legendIcon = computed(() =>
+  expanded.value ? 'pi pi-minus' : 'pi pi-plus'
+)
+
 const expanded = ref(true)
 </script>
 
@@ -21,22 +25,19 @@ const expanded = ref(true)
   <div class="container bg-white">
     <Divider align="left">
       <Button
-        v-if="expanded"
         class="p-button-text"
-        icon="pi pi-minus"
+        :icon="legendIcon"
         :label="props.tag"
-        @click="expanded = false"
-      />
-      <Button
-        v-else
-        class="p-button-text"
-        icon="pi pi-plus"
-        :label="props.tag"
-        @click="expanded = true"
+        @click="expanded = !expanded"
       />
     </Divider>
-    <div class="p-2">
-      <slot v-if="expanded" :items="props.items" />
-    </div>
+    <Transition
+      enter-active-class="animate__animated animate__bounceInDown animate__faster"
+      leave-active-class="animate__animated animate__bounceOutUp animate__faster"
+    >
+      <div v-show="expanded" class="p-2">
+        <slot :items="props.items" />
+      </div>
+    </Transition>
   </div>
 </template>

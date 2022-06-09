@@ -11,8 +11,12 @@ const expenses = JSON.parse(localStorage.getItem('scrooge-expenses'))
 <template>
   <div id="expenses-list" class="page">
     <ExpenseList :expenses="expenses">
-      <template #paginator="{ records, filterDate }">
-        <ExpenseListPaginator :expenses="records" @filter:date="filterDate" />
+      <template #paginator="{ records, activeDate, onDateChanged }">
+        <ExpenseListPaginator
+          :active-date="activeDate"
+          :expenses="records"
+          @update:date="onDateChanged"
+        />
       </template>
 
       <template #itemgroup="{ key, itemList }">
