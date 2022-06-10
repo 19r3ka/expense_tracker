@@ -1,6 +1,8 @@
 <script setup>
 import { computed } from 'vue'
+import moment from 'moment'
 import { categories } from '../helpers/expense'
+import ExpenseListItemMenu from './ExpenseListItemMenu.vue'
 
 const props = defineProps({
   item: {
@@ -9,8 +11,10 @@ const props = defineProps({
   },
 })
 
-const colorShade = 200
+// sets the default color shade for the icons
+const colorShade = 200 //Todo: move this to a config file in a utils holder
 
+// formats the expense amount to locale currency
 const total = computed(() =>
   Number(props.item.amount).toLocaleString(undefined, {
     style: 'currency',
@@ -18,8 +22,13 @@ const total = computed(() =>
   })
 )
 
+// sets the currency to use for the expense total formatting
 const currency = computed(() => props.item.currency || 'XOF')
 
+// formats the expense timestamp to a human readable time format
+const time = computed(() => moment(props.item.datetime).format('hh:mm a'))
+
+// sets the category icon to use for the expense item
 const iconColorClass = computed(
   () =>
     `text-${
@@ -27,6 +36,7 @@ const iconColorClass = computed(
     }-${colorShade}`
 )
 
+// sets the color of the text for the category displayed on item
 const textColorClass = computed(
   () =>
     `text-${
@@ -34,17 +44,16 @@ const textColorClass = computed(
     }-${colorShade * 2}`
 )
 
+// sets the category icon
 const categoryIcon = computed(
   () => categories.find((item) => item.name === props.item.category).icon
 )
 
+// formats the item's description
 const title = computed(() => capitalize(props.item.description))
 
-const capitalize = (str) =>
-  str
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
+// Capitalizes the first letter of a string
+const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1) // todo: move this to a helper file
 </script>
 
 <template>
@@ -66,8 +75,10 @@ const capitalize = (str) =>
       </p>
     </div>
 
-    <div class="col-4 flex flex-column">
+    <div class="col-4 flex flex-column justify-content-between">
       <p class="text-red-400 text-right text-xs m-0">- {{ total }}</p>
+      <p class="text-400 text-right text-xs m-0">{{ time }}</p>
+      <ExpenseListItemMenu :item="props.item" />
     </div>
   </div>
 </template>

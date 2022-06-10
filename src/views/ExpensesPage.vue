@@ -19,8 +19,12 @@ const expenses = JSON.parse(localStorage.getItem('scrooge-expenses'))
         />
       </template>
 
-      <template #itemgroup="{ key, itemList }">
-        <ExpenseListItemGroup v-slot="{ items }" :tag="key" :items="itemList">
+      <template #itemgroup="{ displayTag, itemList }">
+        <ExpenseListItemGroup
+          v-slot="{ items }"
+          :legend="displayTag"
+          :items="itemList"
+        >
           <div v-for="(item, index) in items" :key="index">
             <ExpenseListItem :item="item" />
             <Divider v-if="index < items.length - 1" />

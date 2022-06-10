@@ -2,7 +2,7 @@
 
 import { createRouter, createWebHistory } from 'vue-router'
 const Home = () => import('../views/HomePage.vue')
-const NewExpense = () => import('../views/NewExpensePage.vue')
+const ExpenseEditor = () => import('../views/NewExpensePage.vue')
 const NotFound = () => import('../views/NotFoundPage.vue')
 const LoadBackup = () => import('../views/LoadBackupPage.vue')
 const Expenses = () => import('../views/ExpensesPage.vue')
@@ -15,6 +15,12 @@ const routes = [
     meta: { displayTitle: 'Home' },
   },
   {
+    path: '/expense/:id/edit',
+    name: 'ExpenseEditPage',
+    component: ExpenseEditor,
+    meta: { displayTitle: 'Edit an expense' },
+  },
+  {
     path: '/expenses/',
     name: 'ExpensesPage',
     component: Expenses,
@@ -23,7 +29,7 @@ const routes = [
   {
     path: '/expenses/new',
     name: 'NewExpensePage',
-    component: NewExpense,
+    component: ExpenseEditor,
     meta: { displayTitle: 'Add an expense' },
   },
   {

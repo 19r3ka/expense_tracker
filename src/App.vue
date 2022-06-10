@@ -1,11 +1,13 @@
 <script setup>
 import AppHeader from './components/AppHeader.vue'
 import Toast from 'primevue/toast'
+import ConfirmDialog from 'primevue/confirmdialog'
 </script>
 
 <template>
   <div id="app-shell" class="h-screen w-screen">
     <Toast position="bottom-center" />
+    <ConfirmDialog></ConfirmDialog>
     <AppHeader />
 
     <RouterView v-slot="{ Component }">

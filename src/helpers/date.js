@@ -18,3 +18,6 @@ export const sortObjectsByDate = (prev, curr) => {
 
   return prev
 }
+
+// format number to two digits
+export const padLeft = (num) => (num < 10 ? `0${num}` : num)

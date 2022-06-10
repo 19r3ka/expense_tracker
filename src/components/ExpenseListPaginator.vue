@@ -1,6 +1,7 @@
 <script setup>
 import { computed, defineEmits } from 'vue'
 import Button from 'primevue/button'
+import moment from 'moment'
 
 const props = defineProps({
   expenses: {
@@ -19,6 +20,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:date'])
 
+// modelValue-inspired computed property for the active month
 const activeMonth = computed({
   get: () => props.activeDate.month,
   set: (value) => {
@@ -26,6 +28,7 @@ const activeMonth = computed({
   },
 })
 
+// modelValue-inspired computed property for the active year
 const activeYear = computed({
   get: () => props.activeDate.year,
   set: (value) => {
@@ -33,30 +36,42 @@ const activeYear = computed({
   },
 })
 
+// gets the previous year on record if any
 const previousYear = computed(() => {
   const prev = activeYear.value - 1
   const res = years.includes(prev) ? prev : null
   return res
 })
 
+// gets the next year on record if any
 const previousMonth = computed(() => {
   const prev = activeMonth.value - 1
   const res = recordDates[activeYear.value].includes(prev) ? prev : null
   return res
 })
 
+// gets the next year on record if any
 const nextYear = computed(() => {
   const next = activeYear.value + 1
   const res = years.includes(next) ? next : null
   return res
 })
 
+// gets the next year on record if any
 const nextMonth = computed(() => {
   const next = activeMonth.value + 1
   const res = recordDates[activeYear.value].includes(next) ? next : null
   return res
 })
 
+// properly formats the year and month for display
+const displayDate = computed(() =>
+  moment(`${activeYear.value}-${activeMonth.value}`, 'YYYY-MM').format(
+    'MMMM YYYY'
+  )
+)
+
+// reduces array like [year, year's data] to object with records' years as key and array of record months per year as value
 const sortMonthsByYear = (prev, [year, data]) => {
   const yearMonths = Object.keys(data).map(Number)
   prev[year] = yearMonths
@@ -64,6 +79,7 @@ const sortMonthsByYear = (prev, [year, data]) => {
   return prev
 }
 
+// sets the previous year on record as the active year
 const getPreviousYear = () => {
   activeYear.value = previousYear.value
   activeMonth.value =
@@ -72,6 +88,7 @@ const getPreviousYear = () => {
       : recordDates[activeYear.value].at(-1)
 }
 
+// sets the next year on record as the active year
 const getNextYear = () => {
   activeYear.value = nextYear.value
   activeMonth.value =
@@ -80,15 +97,19 @@ const getNextYear = () => {
       : recordDates[activeYear.value].at(-1)
 }
 
+// sets the previous month on record as the active month
 const getPreviousMonth = () => {
   activeMonth.value = previousMonth.value
 }
 
+// sets the next month on record as the active month
 const getNextMonth = () => {
   activeMonth.value = nextMonth.value
 }
 
 let years = []
+
+// creates an object with records' years as key and array of record months per year as value
 const recordDates = Object.entries(props.expenses).reduce(sortMonthsByYear, {})
 </script>
 
@@ -108,7 +129,7 @@ const recordDates = Object.entries(props.expenses).reduce(sortMonthsByYear, {})
         @click="getPreviousMonth"
       />
 
-      <p class="m-0">{{ activeMonth }} {{ activeYear }}</p>
+      <p class="m-0">{{ displayDate }}</p>
 
       <Button
         icon="pi pi-angle-right"

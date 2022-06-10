@@ -1,5 +1,7 @@
 <script setup>
-import { computed, reactive } from 'vue'
+import { computed, reactive, watch } from 'vue'
+import moment from 'moment'
+import { padLeft } from '../helpers/date'
 
 const props = defineProps({
   expenses: {
@@ -13,12 +15,38 @@ const activeDate = reactive({
   month: new Date().getMonth() + 1,
 })
 
-// watch(
-//   [() => activeMonth.value, () => activeYear.value],
-//   ([newMonth, newYear], [oldMonth, oldYear]) => {
-//     console.log(`${oldYear}-${oldMonth} -> ${newYear}-${newMonth}`)
-//   }
-// )
+const transitionDirection = {
+  left: {
+    enterClass: 'animate__bounceInRight',
+    leaveClass: 'animate__bounceOutLeft',
+  },
+  right: {
+    enterClass: 'animate__bounceInLeft',
+    leaveClass: 'animate__bounceOutRight',
+  },
+}
+
+const transitionConstants = 'animate__animated animate__faster'
+
+const transistionActive = reactive({
+  enterClass: 'animate__fadeIn',
+  leaveClass: 'animate__fadeOut',
+})
+
+watch(
+  [() => activeDate.month, () => activeDate.year],
+  ([newMonth, newYear], [oldMonth, oldYear]) => {
+    if (newMonth !== oldMonth || newYear !== oldMonth) {
+      const direction =
+        newMonth < oldMonth || newYear < oldYear ? 'right' : 'left'
+
+      transistionActive.enterClass =
+        transitionConstants + ' ' + transitionDirection[direction].enterClass
+      transistionActive.leaveClass =
+        transitionConstants + ' ' + transitionDirection[direction].leaveClass
+    }
+  }
+)
 
 // get the daily records corresponding to the active year and month
 const filteredExpenses = computed(
@@ -29,6 +57,12 @@ const filteredExpenses = computed(
 const expensesByDescDay = computed(() =>
   Object.entries(filteredExpenses.value).sort((a, b) => b[0] - a[0])
 )
+
+// properly format the date to use as legend for itemgroups
+const formatItemGroupDisplayTag = (day) => {
+  const date = `${activeDate.year}-${padLeft(activeDate.month)}-${padLeft(day)}`
+  return moment(date).format('MMM DD')
+}
 
 // updates the activeDate whenever the date is updated in ListPaginator
 const onDateChanged = ({ key, value }) => (activeDate[key] = value)
@@ -46,11 +80,14 @@ const onDateChanged = ({ key, value }) => (activeDate[key] = value)
     />
 
     <TransitionGroup
-      enter-active-class="animate__animated animate__bounceInLeft animate__faster"
-      leave-active-class="animate__animated animate__bounceOutRight animate__faster"
+      :enter-active-class="transistionActive.enterClass"
+      :leave-active-class="transistionActive.leaveClass"
     >
-      <div v-for="[key, itemList] in expensesByDescDay" :key="key">
-        <slot name="itemgroup" v-bind="{ key, itemList }" />
+      <div v-for="[day, itemList] in expensesByDescDay" :key="day">
+        <slot
+          name="itemgroup"
+          v-bind="{ displayTag: formatItemGroupDisplayTag(day), itemList }"
+        />
       </div>
     </TransitionGroup>
   </div>

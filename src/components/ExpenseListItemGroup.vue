@@ -8,16 +8,18 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  tag: {
+  legend: {
     type: String,
     default: '',
   },
 })
 
+// set the divider's icon according to the listgroup's expansion state
 const legendIcon = computed(() =>
   expanded.value ? 'pi pi-minus' : 'pi pi-plus'
 )
 
+// flag to control the expansion of the listgroup
 const expanded = ref(true)
 </script>
 
@@ -27,7 +29,7 @@ const expanded = ref(true)
       <Button
         class="p-button-text"
         :icon="legendIcon"
-        :label="props.tag"
+        :label="legend"
         @click="expanded = !expanded"
       />
     </Divider>
