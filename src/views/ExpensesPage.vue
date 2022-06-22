@@ -4,13 +4,14 @@ import ExpenseListItem from '../components/ExpenseListItem.vue'
 import ExpenseListItemGroup from '../components/ExpenseListItemGroup.vue'
 import ExpenseListPaginator from '../components/ExpenseListPaginator.vue'
 import Divider from 'primevue/divider'
+import useExpenseStore from '../stores/expenses.store.js'
 
-const expenses = JSON.parse(localStorage.getItem('scrooge-expenses'))
+const expenseStore = useExpenseStore()
 </script>
 
 <template>
   <div id="expenses-list" class="page">
-    <ExpenseList :expenses="expenses">
+    <ExpenseList :expenses="expenseStore.all">
       <template #paginator="{ records, activeDate, onDateChanged }">
         <ExpenseListPaginator
           :active-date="activeDate"

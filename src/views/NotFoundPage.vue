@@ -12,7 +12,7 @@ import Button from 'primevue/button'
     </p>
     <Button
       class="p-button-rounded uppercase text-xl"
-      @click="$router.push({ name: 'Home' })"
+      @click="$router.push({ name: 'HomePage' })"
       >Go back to my money</Button
     >
   </div>

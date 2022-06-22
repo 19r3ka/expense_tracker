@@ -1,8 +1,10 @@
 // Create a new vue-router 4
 
 import { createRouter, createWebHistory } from 'vue-router'
+
 const Home = () => import('../views/HomePage.vue')
-const ExpenseEditor = () => import('../views/NewExpensePage.vue')
+const NewExpense = () => import('../views/NewExpensePage.vue')
+const EditExpense = () => import('../views/EditExpensePage.vue')
 const NotFound = () => import('../views/NotFoundPage.vue')
 const LoadBackup = () => import('../views/LoadBackupPage.vue')
 const Expenses = () => import('../views/ExpensesPage.vue')
@@ -16,8 +18,9 @@ const routes = [
   },
   {
     path: '/expense/:id/edit',
-    name: 'ExpenseEditPage',
-    component: ExpenseEditor,
+    name: 'EditExpensePage',
+    component: EditExpense,
+    prop: true,
     meta: { displayTitle: 'Edit an expense' },
   },
   {
@@ -29,7 +32,7 @@ const routes = [
   {
     path: '/expenses/new',
     name: 'NewExpensePage',
-    component: ExpenseEditor,
+    component: NewExpense,
     meta: { displayTitle: 'Add an expense' },
   },
   {

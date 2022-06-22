@@ -19,6 +19,9 @@ const legendIcon = computed(() =>
   expanded.value ? 'pi pi-minus' : 'pi pi-plus'
 )
 
+// reverse the order of the items list
+const itemsOrderedByDescTime = computed(() => [...props.items].reverse())
+
 // flag to control the expansion of the listgroup
 const expanded = ref(true)
 </script>
@@ -38,7 +41,7 @@ const expanded = ref(true)
       leave-active-class="animate__animated animate__bounceOutUp animate__faster"
     >
       <div v-show="expanded" class="p-2">
-        <slot :items="props.items" />
+        <slot :items="itemsOrderedByDescTime" />
       </div>
     </Transition>
   </div>

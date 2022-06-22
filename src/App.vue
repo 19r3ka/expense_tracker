@@ -1,7 +1,29 @@
 <script setup>
-import AppHeader from './components/AppHeader.vue'
+import { useRouter } from 'vue-router'
 import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
 import ConfirmDialog from 'primevue/confirmdialog'
+import AppHeader from './components/AppHeader.vue'
+import useExpenseStore from './stores/expenses.store'
+import { notification } from './helpers/notification'
+import { storeActionMessageOptions } from './config/notification'
+
+const toast$ = useToast()
+const router = useRouter()
+const expenseStore = useExpenseStore()
+
+expenseStore.$onAction(({ name, after, onError }) => {
+  after(() => {
+    toast$.add(
+      notification(storeActionMessageOptions[name].success, 'success', 3000)
+    )
+    router.push({ name: 'ExpensesPage' })
+  })
+
+  onError(() =>
+    toast$.add(notification(storeActionMessageOptions[name].error, 'error'))
+  )
+})
 </script>
 
 <template>

@@ -4,7 +4,8 @@ const monthAsDigitformat = 'M'
 const dayFormat = 'D'
 const yearFormat = 'YYYY'
 
-export const sortObjectsByDate = (prev, curr) => {
+// Groups the expenses by year then month then day
+export const groupExpensesByDate = (prev, curr) => {
   const recordDate = date(curr.datetime)
   const day = recordDate.format(dayFormat)
   const month = recordDate.format(monthAsDigitformat)

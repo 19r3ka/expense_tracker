@@ -1,5 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
+import useExpenseStore from '../stores/expenses.store'
+// import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
 import { useConfirm } from 'primevue/useconfirm'
@@ -10,6 +12,8 @@ const props = defineProps({
     default: () => ({}),
   },
 })
+
+const expenseStore = useExpenseStore()
 
 // holds a reference to the confirm popup service instance
 const confirmService = useConfirm()
@@ -24,7 +28,7 @@ const toggleMenu = (event) => menuEl.value.toggle(event)
 
 // deletes the expense item
 const deleteRecord = () => {
-  console.log('deleteRecord')
+  expenseStore.delete(itemId.value)
 }
 
 // shows the item deletion confirmation popup
@@ -46,7 +50,7 @@ const menuOptions = [
   {
     label: 'Edit',
     icon: 'pi pi-pencil',
-    to: { name: 'ExpenseEditPage', params: { id: itemId.value } },
+    to: { name: 'EditExpensePage', params: { id: itemId.value } },
   },
   { separator: true },
   {

@@ -1,5 +1,4 @@
 <script setup>
-import { useRouter } from 'vue-router'
 import Card from 'primevue/card'
 import FileUpload from 'primevue/fileupload'
 import { useToast } from 'primevue/usetoast'
@@ -10,17 +9,16 @@ import {
   isValidRow,
   notHeaderRow,
 } from '../helpers/seed'
-import useExpense from '../stores/expenses.store'
-import { persistToLocalStorage } from '../helpers/pinia'
-import { sortObjectsByDate } from '../helpers/date'
+import useExpenseStore from '../stores/expenses.store'
+// import { persistToLocalStorage } from '../helpers/pinia'
 
-const expenseStore = useExpense()
-expenseStore.$subscribe(persistToLocalStorage)
+const expenseStore = useExpenseStore()
+// expenseStore.$subscribe(persistToLocalStorage)
 
 const toast$ = useToast()
-const router = useRouter()
 let formatedData = []
 
+// callback function for file upload that handles data reading, records formating and saving into Store
 function onFileUpload(e) {
   const file = e.files[0]
   const reader = new FileReader()
@@ -34,19 +32,7 @@ function onFileUpload(e) {
       .map(formatArray)
       .map(arrayToObject)
 
-    console.log(formatedData.reduce(sortObjectsByDate, {}))
-    localStorage.setItem('scrooge-backup', JSON.stringify(formatedData))
-    const records = formatedData.length
-    expenseStore.seed(formatedData.reduce(sortObjectsByDate, {}))
-
-    toast$.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: `${records} records imported!`,
-      life: 5000,
-    })
-
-    router.push({ name: 'ExpensesPage' })
+    expenseStore.seed(formatedData)
   }
 
   reader.onerror = () => {

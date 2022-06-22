@@ -1,3 +1,5 @@
+import { uuid } from './expense'
+
 const numberOfColumnsInValidRow = 6
 const columnSeparator = ';'
 const rowSeparator = '\r\n'
@@ -65,13 +67,15 @@ export const notHeaderRow = (row) =>
   !row.some((element) => element === 'datetime')
 
 // turn array into object
-export const arrayToObject = (array, id) => ({
+export const arrayToObject = (array) => ({
   description: array[0],
   receipt: array[1],
   datetime: array[2],
-  amount: array[3],
+  amount: Number(array[3]),
   category: array[4].toLowerCase(),
-  location: array[5],
+  location: array[5].split(',').map(Number), // convert string of geoData to array of numbers (lat, lng)
   currency: array[6],
-  id: id + 1,
+  id: uuid(),
+  createdAt: array[2],
+  updatedAt: Date.now(),
 })

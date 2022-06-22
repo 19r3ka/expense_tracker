@@ -2,19 +2,26 @@
 import { computed, reactive, watch } from 'vue'
 import moment from 'moment'
 import { padLeft } from '../helpers/date'
+import { groupExpensesByDate } from '../helpers/date'
 
 const props = defineProps({
   expenses: {
-    type: Object,
-    default: () => ({}),
+    type: Array,
+    default: () => [],
   },
 })
 
+// the month and year which data is in view
 const activeDate = reactive({
   year: new Date().getFullYear(),
   month: new Date().getMonth() + 1,
 })
 
+const expensesGroupedByDate = computed(() =>
+  props.expenses.reduce(groupExpensesByDate, {})
+)
+
+// defines the animate.css transitions to use when changing the active date's records view
 const transitionDirection = {
   left: {
     enterClass: 'animate__bounceInRight',
@@ -50,7 +57,7 @@ watch(
 
 // get the daily records corresponding to the active year and month
 const filteredExpenses = computed(
-  () => props.expenses[activeDate.year][activeDate.month] || []
+  () => expensesGroupedByDate.value[activeDate.year][activeDate.month] || []
 )
 
 // sort the daily records object by descending day
@@ -73,12 +80,11 @@ const onDateChanged = ({ key, value }) => (activeDate[key] = value)
     <slot
       name="paginator"
       v-bind="{
-        records: props.expenses,
+        records: expensesGroupedByDate,
         activeDate,
         onDateChanged,
       }"
     />
-
     <TransitionGroup
       :enter-active-class="transistionActive.enterClass"
       :leave-active-class="transistionActive.leaveClass"
