@@ -3,6 +3,7 @@ import ExpenseList from '../components/ExpenseList.vue'
 import ExpenseListItem from '../components/ExpenseListItem.vue'
 import ExpenseListItemGroup from '../components/ExpenseListItemGroup.vue'
 import ExpenseListPaginator from '../components/ExpenseListPaginator.vue'
+import ExpensesMonthlySummary from '../components/ExpensesMonthlySummary.vue'
 import Divider from 'primevue/divider'
 import useExpenseStore from '../stores/expenses.store.js'
 
@@ -18,6 +19,10 @@ const expenseStore = useExpenseStore()
           :expenses="records"
           @update:date="onDateChanged"
         />
+      </template>
+
+      <template #report="itemList">
+        <ExpensesMonthlySummary :expenses="itemList" />
       </template>
 
       <template #itemgroup="{ displayTag, itemList }">

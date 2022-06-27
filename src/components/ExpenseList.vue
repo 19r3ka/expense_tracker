@@ -85,6 +85,7 @@ const onDateChanged = ({ key, value }) => (activeDate[key] = value)
         onDateChanged,
       }"
     />
+    <slot v-bind="expensesByDescDay" name="report" />
     <TransitionGroup
       :enter-active-class="transistionActive.enterClass"
       :leave-active-class="transistionActive.leaveClass"
