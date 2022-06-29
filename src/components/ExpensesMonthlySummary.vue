@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, reactive } from 'vue'
 import { categories } from '../helpers/expense'
 import { addTransparency, colorHex } from '../helpers/color'
 import Chart from 'primevue/chart'
@@ -97,6 +97,11 @@ const totalAmount = computed(() => {
   })
 })
 
+const transistionActive = reactive({
+  enterClass: 'animate__fadeIn',
+  leaveClass: 'animate__fadeOut',
+})
+
 const labels = computed(() => Object.keys(totalAmountByCategory.value))
 const data = computed(() => Object.values(totalAmountByCategory.value))
 
@@ -142,23 +147,28 @@ const options = {
     </div>
 
     <div id="chart-legend" class="col grid pt-4 pr-3">
-      <div
-        v-for="(amount, category) in totalAmountByCategory"
-        :key="category"
-        class="col-12 grid p-0"
+      <TransitionGroup
+        :enter-active-class="transistionActive.enterClass"
+        :leave-active-class="transistionActive.leaveClass"
       >
-        <div class="icon col-4 text-xs">
-          <i class="material-icons" :class="colorizedText(category)">{{
-            getCategoryIcon(category)
-          }}</i>
-        </div>
+        <div
+          v-for="(amount, category) in totalAmountByCategory"
+          :key="category"
+          class="col-12 grid p-0"
+        >
+          <div class="icon col-4 text-xs">
+            <i class="material-icons" :class="colorizedText(category)">{{
+              getCategoryIcon(category)
+            }}</i>
+          </div>
 
-        <div class="total col-8">
-          <p class="m-0 text-right text-700">
-            {{ formatNumber(amount) }}
-          </p>
+          <div class="total col-8">
+            <p class="m-0 text-right text-700">
+              {{ formatNumber(amount) }}
+            </p>
+          </div>
         </div>
-      </div>
+      </TransitionGroup>
     </div>
   </div>
 </template>
@@ -185,7 +195,6 @@ div#chart-legend {
 .overlay {
   position: relative;
   top: -50%;
-
   width: 100%;
   text-align: center;
   margin: auto;

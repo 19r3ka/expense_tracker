@@ -1,10 +1,12 @@
 <script setup>
+import Divider from 'primevue/divider'
+
 import ExpenseList from '../components/ExpenseList.vue'
+import ExpenseListFilter from '../components/ExpenseListFilter.vue'
 import ExpenseListItem from '../components/ExpenseListItem.vue'
 import ExpenseListItemGroup from '../components/ExpenseListItemGroup.vue'
 import ExpenseListPaginator from '../components/ExpenseListPaginator.vue'
 import ExpensesMonthlySummary from '../components/ExpensesMonthlySummary.vue'
-import Divider from 'primevue/divider'
 import useExpenseStore from '../stores/expenses.store.js'
 
 const expenseStore = useExpenseStore()
@@ -23,6 +25,14 @@ const expenseStore = useExpenseStore()
 
       <template #report="itemList">
         <ExpensesMonthlySummary :expenses="itemList" />
+      </template>
+
+      <template #filter="{ activeCategories, expenses, onCategoriesChanged }">
+        <ExpenseListFilter
+          :active-categories="activeCategories"
+          :expenses="expenses"
+          @update:categories="onCategoriesChanged"
+        />
       </template>
 
       <template #itemgroup="{ displayTag, itemList }">

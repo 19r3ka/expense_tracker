@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import moment from 'moment'
 import { padLeft } from '../helpers/date'
 import { groupExpensesByDate } from '../helpers/date'
@@ -17,6 +17,9 @@ const activeDate = reactive({
   month: new Date().getMonth() + 1,
 })
 
+// the categories which expenses are in view
+const activeCategories = ref([])
+
 const expensesGroupedByDate = computed(() =>
   props.expenses.reduce(groupExpensesByDate, {})
 )
@@ -24,12 +27,12 @@ const expensesGroupedByDate = computed(() =>
 // defines the animate.css transitions to use when changing the active date's records view
 const transitionDirection = {
   left: {
-    enterClass: 'animate__bounceInRight',
-    leaveClass: 'animate__bounceOutLeft',
+    enterClass: 'animate__fadeInRight',
+    leaveClass: 'animate__fadeOutLeft',
   },
   right: {
-    enterClass: 'animate__bounceInLeft',
-    leaveClass: 'animate__bounceOutRight',
+    enterClass: 'animate__fadeInLeft',
+    leaveClass: 'animate__fadeOutRight',
   },
 }
 
@@ -56,13 +59,26 @@ watch(
 )
 
 // get the daily records corresponding to the active year and month
-const filteredExpenses = computed(
-  () => expensesGroupedByDate.value[activeDate.year][activeDate.month] || []
+const monthlyExpenses = computed(
+  () => expensesGroupedByDate.value[activeDate.year][activeDate.month] || {}
 )
 
 // sort the daily records object by descending day
 const expensesByDescDay = computed(() =>
-  Object.entries(filteredExpenses.value).sort((a, b) => b[0] - a[0])
+  Object.entries(monthlyExpenses.value).sort((a, b) => b[0] - a[0])
+)
+
+// filters the expenses taking into account the active categories
+const filteredExpenses = computed(() =>
+  expensesByDescDay.value.reduce((acc, [day, expenses]) => {
+    const filteredExpenses = expenses.filter((expense) =>
+      activeCategories.value.includes(expense.category)
+    )
+
+    if (filteredExpenses.length) acc.push([day, filteredExpenses])
+
+    return acc
+  }, [])
 )
 
 // properly format the date to use as legend for itemgroups
@@ -73,6 +89,10 @@ const formatItemGroupDisplayTag = (day) => {
 
 // updates the activeDate whenever the date is updated in ListPaginator
 const onDateChanged = ({ key, value }) => (activeDate[key] = value)
+
+// updates the activeCategories whenever the categories are updated in ListFilter
+const onCategoriesChanged = (categories) =>
+  (activeCategories.value = categories)
 </script>
 
 <template>
@@ -85,12 +105,23 @@ const onDateChanged = ({ key, value }) => (activeDate[key] = value)
         onDateChanged,
       }"
     />
+
     <slot v-bind="expensesByDescDay" name="report" />
+
+    <slot
+      v-bind="{
+        activeCategories,
+        onCategoriesChanged,
+        expenses: expensesByDescDay,
+      }"
+      name="filter"
+    />
+
     <TransitionGroup
       :enter-active-class="transistionActive.enterClass"
       :leave-active-class="transistionActive.leaveClass"
     >
-      <div v-for="[day, itemList] in expensesByDescDay" :key="day">
+      <div v-for="[day, itemList] in filteredExpenses" :key="day">
         <slot
           name="itemgroup"
           v-bind="{ displayTag: formatItemGroupDisplayTag(day), itemList }"
