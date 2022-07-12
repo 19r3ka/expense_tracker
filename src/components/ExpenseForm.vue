@@ -1,13 +1,16 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import Dropdown from 'primevue/dropdown'
 import InputCalendar from 'primevue/calendar'
 import InputNumber from 'primevue/inputnumber'
+import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import InputLocation from '../components/InputLocation.vue'
+import InputCurrency from '../components/InputCurrency.vue'
 import { categories, defaultValues } from '../helpers/expense'
 import { expenseRules } from '../helpers/vuelidate'
+import useSettingsStore from '../stores/settings.store'
 
 const props = defineProps({
   modelValue: {
@@ -18,12 +21,31 @@ const props = defineProps({
 
 const emits = defineEmits(['update:modelValue'])
 
+const { currentCurrency } = useSettingsStore()
+
 const expense = computed({
   get: () => props.modelValue,
   set: (value) => {
     emits('update:modelValue', value)
   },
 })
+
+const currencyChangeFlag = ref(false)
+const currencyChangeMessage = computed(() =>
+  currencyChangeFlag.value ? 'cancel currency change' : 'change currency'
+)
+
+const toggleCurrencyChange = () => {
+  currencyChangeFlag.value = !currencyChangeFlag.value
+  if (!currencyChangeFlag.value) expense.value.currency = currentCurrency
+}
+
+// const displayCurrency = computed(() => 'AFN')
+const displayCurrency = computed(() =>
+  expense.value.currency.code
+    ? expense.value.currency.code
+    : currentCurrency.code
+)
 
 const v$ = useVuelidate(expenseRules, expense)
 </script>
@@ -49,7 +71,7 @@ const v$ = useVuelidate(expenseRules, expense)
           increment-button-icon="pi pi-plus"
           decrement-button-icon="pi pi-minus"
           mode="currency"
-          currency="XOF"
+          :currency="displayCurrency"
         />
         <label for="amount" class="text-xl capitalize">amount*</label>
       </div>
@@ -58,6 +80,21 @@ const v$ = useVuelidate(expenseRules, expense)
           <small class="p-error">{{ error.$message }}</small>
         </span>
       </span>
+      <span>
+        <Button
+          :label="currencyChangeMessage"
+          class="p-button-secondary p-button-text p-button-sm"
+          @click="toggleCurrencyChange"
+        ></Button>
+      </span>
+    </div>
+
+    <!-- the currency selector dropdown -->
+    <div class="field">
+      <div v-show="currencyChangeFlag" class="control">
+        <label for="currency" class="text-xl capitalize">currency*</label>
+        <InputCurrency v-model="expense.currency" />
+      </div>
     </div>
 
     <!-- the "category" dropdown -->

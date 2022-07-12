@@ -20,19 +20,19 @@ const notNullIsland = ([lat, lng]) =>
   lng <= 90
 
 export const expenseRules = {
-  category: {
-    required,
-    validCategory: helpers.withMessage(
-      'You must select a category',
-      validCategory
-    ),
-  },
   amount: {
     required,
     numeric,
     minValue: helpers.withMessage(
       'Expense amount cannot be zero.',
       minValue(1)
+    ),
+  },
+  category: {
+    required,
+    validCategory: helpers.withMessage(
+      'You must select a category',
+      validCategory
     ),
   },
   datetime: {

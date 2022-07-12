@@ -1,3 +1,5 @@
+import { categories } from './expense'
+
 // map of hex values to color names
 export const colorHex = {
   blue: '#00a0e9',
@@ -27,3 +29,11 @@ export const addTransparency =
     //   return hex.replace(/^#/, '$&' + transparency)
     return hex + transparency
   }
+
+// get the color for the category
+const getCategoryColorName = (category) =>
+  categories.find((c) => c.name === category).color
+
+// returns the color for the category icon
+export const colorizedText = (category, shade = 300) =>
+  `text-${getCategoryColorName(category)}-${shade}`

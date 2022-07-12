@@ -3,6 +3,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import moment from 'moment'
 import { padLeft } from '../helpers/date'
 import { groupExpensesByDate } from '../helpers/date'
+import useAnalyticsStore from '../stores/analytics.store'
 
 const props = defineProps({
   expenses: {
@@ -10,6 +11,8 @@ const props = defineProps({
     default: () => [],
   },
 })
+
+const analyticsStore = useAnalyticsStore()
 
 // the month and year which data is in view
 const activeDate = reactive({
@@ -19,6 +22,11 @@ const activeDate = reactive({
 
 // the categories which expenses are in view
 const activeCategories = ref([])
+
+// return the right monthly summary for the given date (year + month)
+const monthlyReports = computed(() =>
+  analyticsStore.get(activeDate.year, activeDate.month)
+)
 
 const expensesGroupedByDate = computed(() =>
   props.expenses.reduce(groupExpensesByDate, {})
@@ -46,7 +54,7 @@ const transistionActive = reactive({
 watch(
   [() => activeDate.month, () => activeDate.year],
   ([newMonth, newYear], [oldMonth, oldYear]) => {
-    if (newMonth !== oldMonth || newYear !== oldMonth) {
+    if (newMonth !== oldMonth || newYear !== oldYear) {
       const direction =
         newMonth < oldMonth || newYear < oldYear ? 'right' : 'left'
 
@@ -104,9 +112,9 @@ const onCategoriesChanged = (categories) =>
         activeDate,
         onDateChanged,
       }"
-    />
+    ></slot>
 
-    <slot v-bind="expensesByDescDay" name="report" />
+    <slot v-bind="monthlyReports" name="report" />
 
     <slot
       v-bind="{
@@ -115,7 +123,7 @@ const onCategoriesChanged = (categories) =>
         expenses: expensesByDescDay,
       }"
       name="filter"
-    />
+    ></slot>
 
     <TransitionGroup
       :enter-active-class="transistionActive.enterClass"
@@ -125,7 +133,7 @@ const onCategoriesChanged = (categories) =>
         <slot
           name="itemgroup"
           v-bind="{ displayTag: formatItemGroupDisplayTag(day), itemList }"
-        />
+        ></slot>
       </div>
     </TransitionGroup>
   </div>

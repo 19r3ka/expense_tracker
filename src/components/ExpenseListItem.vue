@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import moment from 'moment'
 import { categories } from '../helpers/expense'
 import ExpenseListItemMenu from './ExpenseListItemMenu.vue'
+import useSettingsStore from '../stores/settings.store'
 
 const props = defineProps({
   item: {
@@ -10,6 +11,8 @@ const props = defineProps({
     default: () => ({}),
   },
 })
+
+const settingsStore = useSettingsStore()
 
 // sets the default color shade for the icons
 const colorShade = 200 //Todo: move this to a config file in a utils holder
@@ -23,7 +26,9 @@ const total = computed(() =>
 )
 
 // sets the currency to use for the expense total formatting
-const currency = computed(() => props.item.currency || 'XOF')
+const currency = computed(
+  () => props.item.currency.code || settingsStore.currentCurrency.code
+)
 
 // formats the expense timestamp to a human readable time format
 const time = computed(() => moment(props.item.datetime).format('hh:mm a'))

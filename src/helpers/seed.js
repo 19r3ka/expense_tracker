@@ -1,4 +1,5 @@
 import { uuid } from './expense'
+import currencyList from '../config/currency'
 
 const numberOfColumnsInValidRow = 6
 const columnSeparator = ';'
@@ -36,8 +37,9 @@ export const formatArray = (array) => {
   const [date, time] = splitDateTime(array[2])
   const dateTime = `${date} ${formatTime(time)}`
   array[2] = dateToTimestamp(dateTime)
-  array[3] = keepNumeric(array[3])
-  array.push(keepAlpha(array[3]))
+  const rawAmount = array[3]
+  array[3] = keepNumeric(rawAmount)
+  array.push(keepAlpha(rawAmount))
 
   return array
 }
@@ -74,7 +76,9 @@ export const arrayToObject = (array) => ({
   amount: Number(array[3]),
   category: array[4].toLowerCase(),
   location: array[5].split(',').map(Number), // convert string of geoData to array of numbers (lat, lng)
-  currency: array[6],
+  currency: array[6]
+    ? currencyList.find((currency) => currency.code === array[6])
+    : currencyList.find((currency) => currency.code === 'XOF'),
   id: uuid(),
   createdAt: array[2],
   updatedAt: Date.now(),

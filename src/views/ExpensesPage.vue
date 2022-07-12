@@ -23,8 +23,8 @@ const expenseStore = useExpenseStore()
         />
       </template>
 
-      <template #report="itemList">
-        <ExpensesMonthlySummary :expenses="itemList" />
+      <template #report="report">
+        <ExpensesMonthlySummary :report="report" />
       </template>
 
       <template #filter="{ activeCategories, expenses, onCategoriesChanged }">

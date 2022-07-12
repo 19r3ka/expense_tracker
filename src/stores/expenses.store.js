@@ -2,13 +2,22 @@ import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import { uuid } from '../helpers/expense'
 
+import useAnalyticsStore from './analytics.store'
+
+const analyticsStore = useAnalyticsStore()
+
 const state = () => {
-  return { expenses: useStorage('scrooge-expenses', []) }
+  return {
+    expenses: useStorage('scrooge-expenses', []),
+  }
 }
 
 const getters = {
   // get all expenses in store
   all: (state) => state.expenses,
+
+  // get all categories in store
+  categories: (state) => state.categories,
 
   // get a specific expense by its id
   get: (state) => (expenseId) =>
@@ -21,6 +30,7 @@ const actions = {
     expense.createdAt = Date.now()
     expense.id = uuid()
     this.expenses.push({ ...expense })
+    analyticsStore.increaseTotals(expense)
   },
 
   // remove expense with specified id from store
@@ -31,7 +41,8 @@ const actions = {
 
     if (recordToDeleteIndex < 0) throw new Error('Expense not found')
 
-    this.expenses.splice(recordToDeleteIndex, 1)
+    const [deletedAmount] = this.expenses.splice(recordToDeleteIndex, 1)
+    analyticsStore.decreaseTotals(deletedAmount)
   },
 
   // Update record with expenseId if it exists with data
@@ -49,6 +60,7 @@ const actions = {
   // Seeds the store with data from backup
   seed(expenses) {
     this.expenses = expenses
+    analyticsStore.resetTotals()
   },
 }
 

@@ -1,109 +1,39 @@
 <script setup>
 import { computed, reactive } from 'vue'
-import { categories } from '../helpers/expense'
-import { addTransparency, colorHex } from '../helpers/color'
+import { categories, formatCurrency, formatNumber } from '../helpers/expense'
+import { addTransparency, colorHex, colorizedText } from '../helpers/color'
 import Chart from 'primevue/chart'
+import useSettingsStore from '../stores/settings.store'
 
 const props = defineProps({
-  expenses: {
+  report: {
     type: Object,
     default: () => {},
   },
 })
 
-// returns dailyExpenses from [day, dailyExpenses]
-const getDailyExpenses = (record) => record[1]
-
-// turns all expenses into a single list of expenses
-const flattenExpenses = (acc, expense) => {
-  acc.push(...expense)
-  return acc
-}
-
-// displays K or M for large numbers
-const formatNumber = (number) => {
-  if (number < 1000) {
-    return number
-  } else if (number < 1000000) {
-    return `${(number / 1000).toFixed(1)}K`
-  } else {
-    return `${(number / 1000000).toFixed(1)}M`
-  }
-}
+const { currentCurrency } = useSettingsStore()
 
 // returns the icon corresponding to category
 const getCategoryIcon = (category) =>
   categories.find((c) => c.name === category).icon
 
-// get the color for the category
-const getCategoryColorName = (category) =>
-  categories.find((c) => c.name === category).color
-
-// returns the color for the category icon
-const colorizedText = (category) => `text-${getCategoryColorName(category)}-300`
-
-// reduces the array of expenses to get the total amount of expenses
-const getTotalExpenses = (total, expense) => total + expense.amount
-
-// filters the expenses according to given category
-const filterExpensesByCategory = (category) => (expense) =>
-  expense.category === category
-
-// computes total amount of expenses per category
-const totalAmountByCategory = computed(() => {
-  // get all expenses into one single list
-  const allExpenses = props.expenses
-    .map(getDailyExpenses)
-    .reduce(flattenExpenses, [])
-
-  // a list of unique categories of expenses
-  const allCategories = Array.from(
-    new Set(allExpenses.map((expense) => expense.category))
-  )
-
-  const totalAmounts = allCategories.reduce(
-    (acc, category) => ({
-      ...acc,
-      [category]: allExpenses
-        .filter(filterExpensesByCategory(category))
-        .reduce(getTotalExpenses, 0),
-    }),
-    {}
-  )
-
-  // sorts the categories by total amount descending
-  return Object.entries(totalAmounts)
-    .sort((entryA, entryB) => entryB[1] - entryA[1])
-    .reduce(
-      (acc, entry) => ({
-        ...acc,
-        [entry[0]]: entry[1],
-      }),
-      {}
-    )
-})
-
 // computes the total amount of expenses
-const totalAmount = computed(() => {
-  const allExpenses = props.expenses
-    .map(getDailyExpenses)
-    .reduce(flattenExpenses, [])
+const totalAmount = computed(() =>
+  formatCurrency(props.report.total, currentCurrency.code)
+)
 
-  const total = allExpenses.reduce(getTotalExpenses, 0)
-
-  return total.toLocaleString(undefined, {
-    style: 'currency',
-    currency: `XOF`,
-  })
-})
+const totalAmountByCategory = computed(() =>
+  Object.entries(props.report.category).filter(([, value]) => value > 0)
+)
 
 const transistionActive = reactive({
   enterClass: 'animate__fadeIn',
   leaveClass: 'animate__fadeOut',
 })
 
-const labels = computed(() => Object.keys(totalAmountByCategory.value))
-const data = computed(() => Object.values(totalAmountByCategory.value))
+const labels = computed(() => Object.keys(props.report.category))
+const data = computed(() => Object.values(props.report.category))
 
 const borderColor = computed(() =>
   labels.value.map(
@@ -152,7 +82,7 @@ const options = {
         :leave-active-class="transistionActive.leaveClass"
       >
         <div
-          v-for="(amount, category) in totalAmountByCategory"
+          v-for="[category, amount] in totalAmountByCategory"
           :key="category"
           class="col-12 grid p-0"
         >

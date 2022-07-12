@@ -6,23 +6,31 @@ import useVuelidate from '@vuelidate/core'
 import Button from 'primevue/button'
 import { defaultValues } from '../helpers/expense'
 import { expenseRules } from '../helpers/vuelidate'
-import useExpense from '../stores/expenses.store'
+import useExpenseStore from '../stores/expenses.store'
+import useSettingsStore from '../stores/settings.store'
 
 const router = useRouter()
-const expenseStore = useExpense()
+const expenseStore = useExpenseStore()
+const { currentCurrency } = useSettingsStore()
 
-const newExpense = reactive(defaultValues)
+const newExpense = reset()
 const isCurrentRoute = computed(
   () => router.currentRoute.value.name === 'NewExpensePage'
 )
 
 const v$ = useVuelidate(expenseRules, newExpense)
 
+// resets the form
+function reset() {
+  return reactive({ ...defaultValues, currency: currentCurrency })
+}
+
 // form submission handler function
 function onFormSubmit(formIsValid) {
   if (formIsValid) {
     newExpense.category = newExpense.category.name
     expenseStore.add(newExpense)
+    reset()
   }
 }
 </script>

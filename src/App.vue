@@ -4,6 +4,7 @@ import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 import ConfirmDialog from 'primevue/confirmdialog'
 import AppHeader from './components/AppHeader.vue'
+import AppMenu from "./components/AppMenu.vue"
 import useExpenseStore from './stores/expenses.store'
 import { notification } from './helpers/notification'
 import { storeActionMessageOptions } from './config/notification'
@@ -30,6 +31,7 @@ expenseStore.$onAction(({ name, after, onError }) => {
   <div id="app-shell" class="h-screen w-screen">
     <Toast position="bottom-center" />
     <ConfirmDialog></ConfirmDialog>
+
     <AppHeader />
 
     <RouterView v-slot="{ Component }">
@@ -47,6 +49,8 @@ expenseStore.$onAction(({ name, after, onError }) => {
         </Transition>
       </template>
     </RouterView>
+
+    <AppMenu class="fixed bottom-0 w-full" />
   </div>
 </template>
 
