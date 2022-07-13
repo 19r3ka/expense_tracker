@@ -5,10 +5,13 @@ import OverlayPanel from 'primevue/overlaypanel'
 import ListBox from 'primevue/listbox'
 import currencyList from '../config/currency'
 import useSettingsStore from '../stores/settings.store'
+import useExpenseStore from '../stores/expenses.store'
+import { arrayToCsv, downloadCsv } from '../helpers/files'
 
 const opcurrency = ref()
 const oplanguage = ref()
 const settingsStore = useSettingsStore()
+const expenseStore = useExpenseStore()
 
 const currentCurrency = computed({
   get: () => settingsStore.currentCurrency,
@@ -19,22 +22,18 @@ const currentLanguage = ref('English')
 
 const contentItems = [
   {
-    label: 'Backup',
-    icon: 'pi pi-database',
-    items: [
-      {
-        label: 'Backup',
-        icon: 'pi pi-fw pi-upload',
-        command: () => {
-          console.log('Backup')
-        },
-      },
-      {
-        label: 'Restore',
-        icon: 'pi pi-download',
-        to: { name: 'LoadBackupPage' },
-      },
-    ],
+    label: 'Download data',
+    icon: 'pi pi-fw pi-download',
+    command: () => {
+      const [headers, rows] = arrayToCsv(expenseStore.all)
+      const data = [headers, rows].join('')
+      downloadCsv(data)
+    },
+  },
+  {
+    label: 'Restore data',
+    icon: 'pi pi-refresh',
+    to: { name: 'LoadBackupPage' },
   },
 ]
 
@@ -60,10 +59,15 @@ const preferencesItems = [
   <div id="settings-page" class="page">
     <section class="grid section p-2 text-600">
       <div class="col-12 section-title">
-        <h3 class="uppercase m-1">Content</h3>
+        <h3 class="uppercase m-1">Backup</h3>
       </div>
 
-      <TieredMenu :model="contentItems" class="w-full" />
+      <TieredMenu
+        id="backup"
+        ref="backup"
+        :model="contentItems"
+        class="w-full"
+      />
     </section>
 
     <section class="grid section p-2 text-600">
