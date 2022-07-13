@@ -6,7 +6,7 @@ import ListBox from 'primevue/listbox'
 import currencyList from '../config/currency'
 import useSettingsStore from '../stores/settings.store'
 import useExpenseStore from '../stores/expenses.store'
-import { arrayToCsv, downloadCsv } from '../helpers/files'
+import { downloadCsv } from '../helpers/backup'
 
 const opcurrency = ref()
 const oplanguage = ref()
@@ -25,9 +25,7 @@ const contentItems = [
     label: 'Download data',
     icon: 'pi pi-fw pi-download',
     command: () => {
-      const [headers, rows] = arrayToCsv(expenseStore.all)
-      const data = [headers, rows].join('')
-      downloadCsv(data)
+      downloadCsv(expenseStore.dataAsCsv)
     },
   },
   {

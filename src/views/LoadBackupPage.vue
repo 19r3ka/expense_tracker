@@ -2,21 +2,12 @@
 import Card from 'primevue/card'
 import FileUpload from 'primevue/fileupload'
 import { useToast } from 'primevue/usetoast'
-import {
-  arrayToObject,
-  csvToArray,
-  formatArray,
-  isValidRow,
-  notHeaderRow,
-} from '../helpers/seed'
+import { csvToObjectArrays } from '../helpers/backup'
 import useExpenseStore from '../stores/expenses.store'
-// import { persistToLocalStorage } from '../helpers/pinia'
 
 const expenseStore = useExpenseStore()
-// expenseStore.$subscribe(persistToLocalStorage)
 
 const toast$ = useToast()
-let formatedData = []
 
 // callback function for file upload that handles data reading, records formating and saving into Store
 function onFileUpload(e) {
@@ -25,12 +16,7 @@ function onFileUpload(e) {
 
   reader.onload = (e) => {
     const data = e.target.result
-
-    formatedData = csvToArray(data)
-      .filter(isValidRow)
-      .filter(notHeaderRow)
-      .map(formatArray)
-      .map(arrayToObject)
+    const formatedData = csvToObjectArrays(data)
 
     expenseStore.seed(formatedData)
   }

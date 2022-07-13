@@ -3,6 +3,7 @@ import { useStorage } from '@vueuse/core'
 import { uuid } from '../helpers/expense'
 
 import useAnalyticsStore from './analytics.store'
+import { arrayToCsv } from '../helpers/backup'
 
 const analyticsStore = useAnalyticsStore()
 
@@ -22,6 +23,9 @@ const getters = {
   // get a specific expense by its id
   get: (state) => (expenseId) =>
     state.expenses.find((expense) => expense.id === expenseId),
+
+  // format store data to CSV
+  dataAsCsv: (state) => arrayToCsv(state.expenses),
 }
 
 const actions = {
