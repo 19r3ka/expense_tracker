@@ -2,7 +2,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import moment from 'moment'
 import { padLeft } from '../helpers/date'
-import { groupExpensesByDate } from '../helpers/date'
+import { groupExpensesByDate } from '../helpers/expense'
 import useAnalyticsStore from '../stores/analytics.store'
 
 const props = defineProps({

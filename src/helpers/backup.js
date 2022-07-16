@@ -1,4 +1,5 @@
 import currencies from '../config/currency'
+import { uuid } from './expense'
 
 let columnSeparator = ';'
 const rowSeparator = '\n'
@@ -69,6 +70,7 @@ export function csvToObjectArrays(csv) {
     })
 
     obj.createdAt = obj.updatedAt = Date.now()
+    obj.id = uuid()
     return obj
   })
   return data

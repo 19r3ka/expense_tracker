@@ -52,7 +52,7 @@ function onFileUpload(e) {
               <div
                 class="border-dashed border-2 border-primary w-full h-10rem flex flex-column align-items-center justify-content-center"
               >
-                <i class="pi pi-file text-6xl text-primary-300" />
+                <i class="pi pi-file text-6xl text-primary-300"></i>
                 <div>
                   <h5 class="text-primary text-center mb-1">
                     Select a CSV file to upload

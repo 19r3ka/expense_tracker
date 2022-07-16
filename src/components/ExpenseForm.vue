@@ -8,7 +8,7 @@ import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import InputLocation from '../components/InputLocation.vue'
 import InputCurrency from '../components/InputCurrency.vue'
-import { categories, defaultValues } from '../helpers/expense'
+import { categories, defaultValues } from '../config/expense'
 import { expenseRules } from '../helpers/vuelidate'
 import useSettingsStore from '../stores/settings.store'
 

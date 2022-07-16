@@ -1,7 +1,9 @@
 <script setup>
 import { computed, reactive } from 'vue'
-import { categories, formatCurrency, formatNumber } from '../helpers/expense'
-import { addTransparency, colorHex, colorizedText } from '../helpers/color'
+import { formatCurrency, formatNumber } from '../helpers/expense'
+import { categories } from '../config/expense'
+import { addTransparency, colorizedText } from '../helpers/color'
+import { colorHex } from '../config/color'
 import Chart from 'primevue/chart'
 import useSettingsStore from '../stores/settings.store'
 

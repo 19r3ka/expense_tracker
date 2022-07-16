@@ -69,7 +69,7 @@ export const decreaseTotalsByAmount = async (acc, expense) => {
 
 // Takes an array of expenses and returns a map of year, month, and day totals including category totals
 export const increaseTotalsByAmount = async (acc, expense, toCurrency) => {
-  const datetime = Moment(expense.datetime)
+  const datetime = Moment.unix(expense.datetime)
   const currency = expense.currency.code
   const category = expense.category
   let amount = expense.amount
@@ -144,3 +144,19 @@ export const formatCurrency = (amount, currency) =>
     style: 'currency',
     currency,
   })
+
+// Groups the expenses by year then month then day
+export const groupExpensesByDate = (prev, curr) => {
+  const recordDate = Moment.unix(curr.datetime)
+  const day = recordDate.get('day')
+  const month = recordDate.get('month') + 1
+  const year = recordDate.get('year')
+
+  if (!(year in prev)) prev[year] = {}
+  if (!(month in prev[year])) prev[year][month] = {}
+  if (!(day in prev[year][month])) prev[year][month][day] = []
+
+  prev[year][month][day].push(curr)
+
+  return prev
+}

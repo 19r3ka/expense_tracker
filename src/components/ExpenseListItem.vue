@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import moment from 'moment'
-import { categories } from '../helpers/expense'
+import { categories } from '../config/expense'
 import ExpenseListItemMenu from './ExpenseListItemMenu.vue'
 import useSettingsStore from '../stores/settings.store'
 

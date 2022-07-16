@@ -1,8 +1,7 @@
 <script setup>
 import { computed, reactive, watch } from 'vue'
 import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
-import { categories } from '../helpers/expense'
-import { defaultValues } from '../helpers/expense'
+import { categories, defaultValues } from '../config/expense'
 import { expenseRules } from '../helpers/vuelidate'
 import { useVuelidate } from '@vuelidate/core'
 import Button from 'primevue/button'

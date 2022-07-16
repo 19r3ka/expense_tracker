@@ -9,6 +9,7 @@ const EditExpense = () => import('../views/EditExpensePage.vue')
 const Settings = () => import('../views/AppSettingsPage.vue')
 const LoadBackup = () => import('../views/LoadBackupPage.vue')
 const NotFound = () => import('../views/NotFoundPage.vue')
+const LoadAirtable = () => import('../views/LoadAirtablePage.vue')
 
 const routes = [
   {
@@ -16,6 +17,12 @@ const routes = [
     name: 'HomePage',
     component: Home,
     meta: { displayTitle: 'Home' },
+  },
+  {
+    path: '/airtable',
+    name: 'LoadAirtablePage',
+    component: LoadAirtable,
+    meta: { displayTitle: 'Airtable' },
   },
   {
     path: '/settings',

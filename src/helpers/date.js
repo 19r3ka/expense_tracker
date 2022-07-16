@@ -1,4 +1,4 @@
-import date from 'moment'
+import Moment from 'moment'
 
 const monthAsDigitformat = 'M'
 const dayFormat = 'D'
@@ -6,7 +6,7 @@ const yearFormat = 'YYYY'
 
 // Groups the expenses by year then month then day
 export const groupExpensesByDate = (prev, curr) => {
-  const recordDate = date(curr.datetime)
+  const recordDate = Moment.unix(curr.datetime)
   const day = recordDate.format(dayFormat)
   const month = recordDate.format(monthAsDigitformat)
   const year = recordDate.format(yearFormat)
