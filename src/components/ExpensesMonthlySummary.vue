@@ -26,7 +26,9 @@ const totalAmount = computed(() =>
 )
 
 const totalAmountByCategory = computed(() =>
-  Object.entries(props.report.category).filter(([, value]) => value > 0)
+  Object.entries(props.report.category)
+    .filter(([, value]) => value > 0)
+    .sort((a, b) => b[1] - a[1])
 )
 
 const transistionActive = reactive({
