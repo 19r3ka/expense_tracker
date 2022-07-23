@@ -3,9 +3,11 @@ import { useStorage } from '@vueuse/core'
 import { uuid } from '../helpers/expense'
 
 import useAnalyticsStore from './analytics.store'
+import useRemindersStore from './reminders.store'
 import { arrayToCsv } from '../helpers/backup'
 
 const analyticsStore = useAnalyticsStore()
+const remindersStore = useRemindersStore()
 
 const state = () => {
   return {
@@ -32,9 +34,10 @@ const actions = {
   // Add new expense to store
   add(expense) {
     expense.createdAt = Date.now()
-    expense.id = uuid()
+    if (!expense.id) expense.id = uuid()
     this.expenses.push({ ...expense })
     analyticsStore.increaseTotals(expense)
+    remindersStore.remove(expense.id)
   },
 
   // remove expense with specified id from store
@@ -43,7 +46,8 @@ const actions = {
       (expense) => expense.id === expenseId
     )
 
-    if (recordToDeleteIndex < 0) throw new Error('Expense not found')
+    if (recordToDeleteIndex < 0)
+      throw new Error(`Expense with id ${expenseId} does not exist`)
 
     const [deletedAmount] = this.expenses.splice(recordToDeleteIndex, 1)
     analyticsStore.decreaseTotals(deletedAmount)
@@ -55,7 +59,8 @@ const actions = {
       (expense) => expense.id === data.id
     )
 
-    if (recordToUpdateIndex < 0) throw new Error('Expense not found')
+    if (recordToUpdateIndex < 0)
+      throw new Error(`Expense with id ${data.id} does not exist`)
 
     data.updatedAt = Date.now()
     this.expenses[recordToUpdateIndex] = data

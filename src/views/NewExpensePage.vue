@@ -1,19 +1,30 @@
 <script setup>
-import { computed, reactive } from 'vue'
+import { computed, reactive, watch } from 'vue'
+import Moment from 'moment'
 import { useRouter } from 'vue-router'
 import ExpenseForm from '../components/ExpenseForm.vue'
 import useVuelidate from '@vuelidate/core'
 import Button from 'primevue/button'
-import { defaultValues } from '../helpers/expense'
+import { defaultValues } from '../config/expense'
 import { expenseRules } from '../helpers/vuelidate'
 import useExpenseStore from '../stores/expenses.store'
 import useSettingsStore from '../stores/settings.store'
+import useRemindersStore from '../stores/reminders.store'
 
+const props = defineProps({
+  reminderId: {
+    type: String,
+    default: '',
+  },
+})
 const router = useRouter()
 const expenseStore = useExpenseStore()
 const { currentCurrency } = useSettingsStore()
+const remindersStore = useRemindersStore()
 
-const newExpense = reset()
+let newExpense = reactive(defaultValues)
+reset()
+
 const isCurrentRoute = computed(
   () => router.currentRoute.value.name === 'NewExpensePage'
 )
@@ -22,7 +33,17 @@ const v$ = useVuelidate(expenseRules, newExpense)
 
 // resets the form
 function reset() {
-  return reactive({ ...defaultValues, currency: currentCurrency })
+  const expense = reactive({ currency: currentCurrency })
+  const reminder = remindersStore.get(props.reminderId)
+
+  if (reminder) {
+    const { date, id, location } = reminder
+    expense.datetime = Moment(date).toDate() // convert timestamp to Date format accepted by primevue/calendar
+    expense.id = id
+    expense.location = location
+  }
+
+  newExpense = expense
 }
 
 // form submission handler function
@@ -33,6 +54,8 @@ function onFormSubmit(formIsValid) {
     reset()
   }
 }
+
+watch(() => props.reminderId, reset)
 </script>
 
 <template>
@@ -48,7 +71,7 @@ function onFormSubmit(formIsValid) {
           label="Save"
           :disabled="v$.$invalid"
           @click="onFormSubmit(!v$.$invalid)"
-        />
+        ></Button>
       </Teleport>
     </div>
   </div>

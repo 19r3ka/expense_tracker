@@ -1,3 +1,4 @@
+// formats the notification options for toast component
 export const notification = (
   message,
   severity = 'success',

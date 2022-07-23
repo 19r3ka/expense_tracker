@@ -10,7 +10,7 @@ function getLocationCallback(resolve, reject) {
   }
 
   if (!('geolocation' in navigator)) {
-    reject(new Error('Geolocation is not available'))
+    reject(new Error('Geolocation API is not supported by your browser'))
   }
 
   navigator.geolocation.getCurrentPosition(onSuccess, onError)
