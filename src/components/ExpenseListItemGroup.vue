@@ -34,14 +34,14 @@ const expanded = ref(true)
         :icon="legendIcon"
         :label="legend"
         @click="expanded = !expanded"
-      />
+      ></Button>
     </Divider>
     <Transition
       enter-active-class="animate__animated animate__fadeInDown animate__faster"
       leave-active-class="animate__animated animate__fadeOutUp animate__faster"
     >
-      <div v-show="expanded" class="p-2">
-        <slot :items="itemsOrderedByDescTime" />
+      <div v-show="expanded" v-auto-animate class="p-2">
+        <slot :items="itemsOrderedByDescTime"></slot>
       </div>
     </Transition>
   </div>

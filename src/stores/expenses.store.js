@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
+import Moment from 'moment'
 import { useStorage } from '@vueuse/core'
-import { uuid } from '../helpers/expense'
+import { sortMonthsByYear, uuid } from '../helpers/expense'
 
 import useAnalyticsStore from './analytics.store'
 import useRemindersStore from './reminders.store'
@@ -19,15 +20,44 @@ const getters = {
   // get all expenses in store
   all: (state) => state.expenses,
 
-  // get all categories in store
-  categories: (state) => state.categories,
+  // format store data to CSV
+  dataAsCsv: (state) => arrayToCsv(state.expenses),
+
+  // get the latest expenses in store limited by 'limit' param
+  latest: (state) => state.expenses.slice(-5),
 
   // get a specific expense by its id
   get: (state) => (expenseId) =>
     state.expenses.find((expense) => expense.id === expenseId),
 
-  // format store data to CSV
-  dataAsCsv: (state) => arrayToCsv(state.expenses),
+  // filter expenses by year, month, day
+  getByDate: (state) => (year, month, day) => {
+    if (!year) return
+    let lowerBound = Moment(String(year), 'YYYY')
+    let upperBound = Moment(String(year + 1), 'YYYY')
+
+    if (month) {
+      lowerBound = Moment(String(`${year}-${month}`), 'YYYY-MM')
+      upperBound = Moment(String(`${year}-${month + 1}`), 'YYYY-MM')
+    }
+
+    if (day) {
+      lowerBound = Moment(String(`${year}-${month}-${day}`), 'YYYY-MM-DD')
+      upperBound = Moment(String(`${year}-${month}-${day + 1}`), 'YYYY-MM-DD')
+    }
+
+    return state.expenses.filter((expense) =>
+      Moment.unix(expense.datetime).isBetween(
+        lowerBound,
+        upperBound,
+        undefined,
+        '[)'
+      )
+    )
+  },
+
+  // map all expesenes' datetimes like {year: [months]}
+  monthsByYearMap: (state) => state.expenses.reduce(sortMonthsByYear, {}),
 }
 
 const actions = {

@@ -49,8 +49,9 @@ function reset() {
 // form submission handler function
 function onFormSubmit(formIsValid) {
   if (formIsValid) {
-    newExpense.category = newExpense.category.name
-    expenseStore.add(newExpense)
+    let category = newExpense.category.name
+    let datetime = Moment(newExpense.datetime).unix()
+    expenseStore.add({ ...newExpense, category, datetime })
     reset()
   }
 }

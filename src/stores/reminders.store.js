@@ -11,7 +11,7 @@ const actions = {
 
   // removes a reminder from the store
   remove(id) {
-    if (!this.get(id)) throw new Error(`Reminder with id ${id} does not exist`)
+    if (!this.get(id)) return
     this.reminders = this.reminders.filter((reminder) => reminder.id !== id)
   },
 }

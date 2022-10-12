@@ -4,8 +4,8 @@ import MultiSelect from 'primevue/multiselect'
 
 const props = defineProps({
   expenses: {
-    type: Object,
-    default: () => {},
+    type: Array,
+    default: () => [],
   },
   activeCategories: {
     type: Array,
@@ -15,8 +15,8 @@ const props = defineProps({
 
 const emits = defineEmits(['update:categories'])
 
-// modelValue-inspired computed property for the active month
-const activeCategories = computed({
+// modelValue-inspired computed p roperty for the active month
+let selectedCategories = computed({
   get: () => props.activeCategories,
   set: (value) => {
     emits('update:categories', value)
@@ -24,26 +24,16 @@ const activeCategories = computed({
 })
 
 const categories = computed(() =>
-  Array.from(
-    new Set(
-      props.expenses
-        .map((entry) => entry[1].map((expense) => expense.category))
-        .reduce((acc, expense) => {
-          acc.push(...expense)
-          return acc
-        }, [])
-    )
-  )
+  Array.from(new Set(props.expenses.map((expense) => expense.category))).sort()
 )
 
-// make sure all the expenses are shown by default
-activeCategories.value = categories.value
+selectedCategories.value = categories.value
 </script>
 
 <template>
   <div class="component pt-3">
     <MultiSelect
-      v-model="activeCategories"
+      v-model="selectedCategories"
       :options="categories"
       :option-label="(category) => category"
       class="w-full"

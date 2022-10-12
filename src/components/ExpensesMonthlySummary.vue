@@ -10,7 +10,7 @@ import useSettingsStore from '../stores/settings.store'
 const props = defineProps({
   report: {
     type: Object,
-    default: () => {},
+    default: () => ({ category: {} }),
   },
 })
 
@@ -36,8 +36,8 @@ const transistionActive = reactive({
   leaveClass: 'animate__fadeOut',
 })
 
-const labels = computed(() => Object.keys(props.report.category))
-const data = computed(() => Object.values(props.report.category))
+const labels = computed(() => Object.keys(props.report?.category))
+const data = computed(() => Object.values(props.report?.category))
 
 const borderColor = computed(() =>
   labels.value.map(

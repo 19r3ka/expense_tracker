@@ -44,8 +44,9 @@ export const increaseTotalsByAmount = async (acc, expense, toCurrency) => {
   let decreasing = amount < 0 ? true : false // are we remove or adding to totals?
 
   const expenseYear = datetime.get('year')
-  const expenseMonth = datetime.month() + 1
-  const expenseDay = datetime.date()
+  const expenseMonth = datetime.get('month') + 1
+  const expenseDay = datetime.get('date')
+  const expenseHour = datetime.get('hour')
 
   if (currency !== toCurrency) {
     amount = await convertCurrency(
@@ -73,11 +74,18 @@ export const increaseTotalsByAmount = async (acc, expense, toCurrency) => {
   month.category[category] = (month.category[category] || 0) + amount
 
   if (!(expenseDay in month.day)) {
-    month.day[expenseDay] = { category: {}, total: 0 }
+    month.day[expenseDay] = { category: {}, hour: {}, total: 0 }
   }
   const day = month.day[expenseDay]
   day.total += amount
   day.category[category] = (day.category[category] || 0) + amount
+
+  if (!(expenseHour in day.hour)) {
+    day.hour[expenseHour] = { category: {}, total: 0 }
+  }
+  const hour = day.hour[expenseHour]
+  hour.total += amount
+  hour.category[category] = (hour.category[category] || 0) + amount
 
   return acc
 }
@@ -116,7 +124,7 @@ export const formatCurrency = (amount, currency) =>
 // Groups the expenses by year then month then day
 export const groupExpensesByDate = (prev, curr) => {
   const recordDate = Moment.unix(curr.datetime)
-  const day = recordDate.get('day')
+  const day = recordDate.get('date')
   const month = recordDate.get('month') + 1
   const year = recordDate.get('year')
 
@@ -126,5 +134,30 @@ export const groupExpensesByDate = (prev, curr) => {
 
   prev[year][month][day].push(curr)
 
+  return prev
+}
+
+// Groups the expenses by day
+export const groupExpensesByDay = (prev, curr) => {
+  const recordDate = Moment.unix(curr.datetime)
+  const day = recordDate.get('date')
+
+  if (!(day in prev)) prev[day] = []
+
+  prev[day].push(curr)
+
+  return prev
+}
+
+// Reduces all expenses list by datetime in the format {year: [months]}
+export const sortMonthsByYear = (prev, expense) => {
+  const datetime = Moment.unix(expense.datetime)
+  const month = datetime.get('month') + 1
+  const year = datetime.get('year')
+
+  if (!(year in prev)) prev[year] = []
+  prev[year] = [...new Set([...prev[year], Number(month)])].sort(
+    (a, b) => a - b
+  )
   return prev
 }
